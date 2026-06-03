@@ -1,4 +1,5 @@
 def validate_sql(sql):
+    sql = str(sql).replace(";", "").strip()
     forbidden_words = [
         "insert", "update", "delete", "drop", "alter",
         "create", "truncate", "merge", "grant", "revoke"
