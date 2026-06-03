@@ -30,8 +30,6 @@ if st.button("Run Query"):
             with st.spinner("Generating SQL..."):
                 
             st.subheader("Generated SQL")
-            #st.code(sql, language="sql")
-            #validate_sql(sql)
             with st.spinner("Running query on Oracle Database..."):
                 result_df = run_sql()
             st.subheader("Query Result")
