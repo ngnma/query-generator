@@ -11,6 +11,6 @@ connection = oracledb.connect(
     wallet_password="YOUR_WALLET_PASSWORD"
 )
 
-def run_sql(query="SELECT * FROM AMAZON FETCH FIRST 10 ROWS ONLY")
+def run_sql(query="SELECT * FROM AMAZON FETCH FIRST 10 ROWS ONLY"):
     df = pd.read_sql(query, connection)
     print(df.head())
