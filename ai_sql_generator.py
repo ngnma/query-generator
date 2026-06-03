@@ -6,28 +6,17 @@ import oci
 from oci.generative_ai_inference import GenerativeAiInferenceClient
 from oci.generative_ai_inference.models import OnDemandServingMode, ChatDetails, CohereChatRequest
 
-
+# 1. Setup the secure instance identification token
 signer = oci.auth.signers.InstancePrincipalsSecurityTokenSigner()
 
+# 2. Configure the AI client using the dynamic server signer
 gen_ai_client = GenerativeAiInferenceClient(
-    config={},  # Pass an empty config dict when using Instance Principals
+    config={},
     signer=signer,
     service_endpoint="https://inference.generativeai.uk-london-1.oci.oraclecloud.com"
 )
-# -------------------------------------------------
 
-compartment_id = "ocid1.tenancy.oc1..aaaaaaaapigjcw7dwdp6onerp5wqcu3z5pzsckmokdiqjezvoodfi2corv6q"
-model_id = "cohere.command-r-plus-08-2024"
-
-
-
-config = oci.config.from_file("~/.oci/config", "DEFAULT")
-
-gen_ai_client = GenerativeAiInferenceClient(
-    config=config,
-    service_endpoint="https://inference.generativeai.uk-london-1.oci.oraclecloud.com"
-)
-
+# 3. Setup your structural compartment routing IDs
 compartment_id = "ocid1.tenancy.oc1..aaaaaaaapigjcw7dwdp6onerp5wqcu3z5pzsckmokdiqjezvoodfi2corv6q"
 model_id = "cohere.command-r-plus-08-2024"
 
