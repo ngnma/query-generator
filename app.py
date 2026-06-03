@@ -129,7 +129,7 @@ def evaluate_ai_response():
     - Generate SELECT queries only.
     - IMPORTANT FOR NUMBERS: Columns like 'rating' and 'rating_count' may be stored as VARCHAR2. 
       Always use TO_NUMBER(REGEXP_REPLACE(column_name, '[^0-9.]', '')) when filtering or sorting numeric calculations to safely handle formatting characters like commas or spaces.
-    - Do not use ; at the end of the sql 
+    
     Example:
     User Query:
     Retrieve product names where the evaluation count is over 1000.
@@ -145,7 +145,8 @@ def evaluate_ai_response():
     User Query:
     {user_question}
 
-        
+    Note: Dont add ; at the end of the SQL Query.
+    
     [CONVERSATION HISTORY TRACKER]
     {conversation_history if "conversation_history" in locals() else ""}
     
