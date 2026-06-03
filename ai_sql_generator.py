@@ -46,7 +46,7 @@ def generate_sql(user_question, schema_text):
     
     SQL Output:
     SELECT product_id, product_name
-    FROM AMAZON_SALES
+    FROM AMAZON
     ORDER BY discount_percentage DESC
     FETCH FIRST 3 ROWS ONLY;
     
