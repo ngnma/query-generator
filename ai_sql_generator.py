@@ -1,3 +1,79 @@
+# def generate_sql(user_question, schema_text):
+#     return user_question
+
+
+import oci
+import ads
+from oci.generative_ai_inference import GenerativeAiInferenceClient
+from oci.generative_ai_inference.models import OnDemandServingMode, ChatDetails, CohereChatRequest
+
+ads.set_auth("resource_principal")
+signer = oci.auth.signers.get_resource_principals_signer()
+
+gen_ai_client = GenerativeAiInferenceClient(
+    config={},
+    signer=signer,
+    service_endpoint="https://inference.generativeai.uk-london-1.oci.oraclecloud.com"
+)
+
+compartment_id = "ocid1.tenancy.oc1..aaaaaaaapigjcw7dwdp6onerp5wqcu3z5pzsckmokdiqjezvoodfi2corv6q"
+model_id = "cohere.command-r-plus-08-2024"
+
 def generate_sql(user_question, schema_text):
-    # return "SELECT * FROM AMAZON FETCH FIRST 1 ROWS ONLY"
-    return user_question
+    prompt = f"""
+    You are an expert Oracle SQL generator.
+    
+    Your task is to translate the user's natural language question into a valid Oracle SQL query.
+    
+    Use ONLY the table and columns listed in the schema.
+    
+    Database Schema:
+    {schema_text}
+    
+    Rules:
+    - Return ONLY the SQL query.
+    - Do not include explanations.
+    - Do not include markdown.
+    - Do not wrap the SQL in ```sql.
+    - Use Oracle SQL syntax.
+    - Use FETCH FIRST N ROWS ONLY instead of LIMIT.
+    - Generate SELECT queries only.
+    - Do not generate INSERT, UPDATE, DELETE, DROP, ALTER, CREATE, TRUNCATE, MERGE, GRANT, or REVOKE statements.
+    - If the user asks for "top", "highest", or "best", use ORDER BY DESC.
+    - If the user asks for "lowest", "worst", or "least", use ORDER BY ASC.
+    
+    Example:
+    User Query:
+    Retrieve the IDs and names of the top 3 products with the highest discount percentages.
+    
+    SQL Output:
+    SELECT product_id, product_name
+    FROM AMAZON_SALES
+    ORDER BY discount_percentage DESC
+    FETCH FIRST 3 ROWS ONLY;
+    
+    Real Task:
+    User Query:
+    {user_question}
+    
+    SQL Output:
+    """
+
+    chat_request = CohereChatRequest()
+    chat_request.message = prompt
+    chat_request.max_tokens = 300
+    chat_request.temperature = 0.0
+
+    chat_detail = ChatDetails()
+    chat_detail.compartment_id = compartment_id
+    chat_detail.serving_mode = OnDemandServingMode(model_id=model_id)
+    chat_detail.chat_request = chat_request
+
+    try:
+        response = gen_ai_client.chat(chat_detail)
+        sql = response.data.chat_response.text.strip()
+        sql = sql.replace("```sql", "").replace("```", "").strip()
+        return sql
+
+    except Exception as e:
+        raise Exception(f"Error generating SQL from OCI Generative AI: {e}")
