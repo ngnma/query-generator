@@ -29,7 +29,7 @@ if st.button("Run Query"):
         try:
             with st.spinner("Generating SQL..."):
                 
-            st.subheader("Generated SQL")
+                st.subheader("Generated SQL")
             with st.spinner("Running query on Oracle Database..."):
                 result_df = run_sql()
             st.subheader("Query Result")
