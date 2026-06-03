@@ -37,12 +37,67 @@ def evaluate_ai_response():
     # Check if we hit the limit of 3 follow-ups
     force_generation = "true" if st.session_state.follow_up_count >= 3 else "false"
     
-    prompt_payload = f"""
-    You are an expert Oracle SQL architect and natural language classifier.
+    # prompt_payload = f"""
+    # You are an expert Oracle SQL architect and natural language classifier.
     
-    Your task is to analyze the user's inquiry stream. You must determine if the total context accumulated across the conversation history is specific enough to build a definitive Oracle SQL query.
+    # Your task is to analyze the user's inquiry stream. You must determine if the total context accumulated across the conversation history is specific enough to build a definitive Oracle SQL query.
     
-    CRITICAL RULE: Look at the conversation history carefully. Do not repeat questions that the user has already answered! Read their previous responses to build your context.
+    # CRITICAL RULE: Look at the conversation history carefully. Do not repeat questions that the user has already answered! Read their previous responses to build your context.
+
+    # Database Schema:
+    # Table name: amazon
+    # Columns:
+    # - product_id (VARCHAR2): Product ID
+    # - product_name (VARCHAR2): Product name
+    # - category (VARCHAR2): Product category
+    # - discounted_price (VARCHAR2): Discounted price
+    # - actual_price (VARCHAR2): Original price
+    # - discount_percentage (VARCHAR2): Discount percentage
+    # - rating (VARCHAR2): Product rating
+    # - rating_count (VARCHAR2): Number of ratings/reviews
+    # - about_product (VARCHAR2): Product description
+    # - user_id (VARCHAR2): User ID
+    # - user_name (VARCHAR2): User name
+    # - review_id (VARCHAR2): Review ID
+    # - review_title (VARCHAR2): Review title
+    # - review_content (VARCHAR2): Review content
+    # - img_link (VARCHAR2): Product image link
+    # - product_link (VARCHAR2): Product page link
+
+    # HARD GRADUATION RULE:
+    # Is force_generation equal to true? [Value: {force_generation}]
+    # If force_generation is true, you MUST set "status": "success" and output your absolute best guess SELECT query using the columns available. Do not ask any more questions.
+    
+    # Rules for Classification (If force_generation is false):
+    # 1. If context is missing clear metrics, set "status": "ambiguous" and provide a NEW, explicit follow-up question in "follow_up_message". Leave "sql" as null.
+    # 2. If specific enough, set "status": "success", "follow_up_message": null, and generate the valid Oracle SQL string in "sql".
+    
+    # SQL Generation Rules:
+    # - Use Oracle SQL syntax. FETCH FIRST N ROWS ONLY instead of LIMIT.
+    # - Generate SELECT queries only. No destructive commands.
+    # - Always use TO_NUMBER(REGEXP_REPLACE(column_name, '[^0-9.]', '')) when filtering or sorting numeric columns like 'rating' and 'rating_count'.
+    
+    # You MUST respond with a raw JSON object matching this structure exactly:
+    # {{
+    #     "status": "success" or "ambiguous",
+    #     "follow_up_message": "Clarification question text here if ambiguous, otherwise null",
+    #     "sql": "The generated SQL query here if success, otherwise null"
+    # }}
+
+    # Note: Dont add ; at the end of the SQL Query.
+    
+    # [CONVERSATION HISTORY TRACKER]
+    # {conversation_history if "conversation_history" in locals() else ""}
+    
+    # Output:
+    # """
+ prompt_payload = f"""
+    You are an expert Oracle SQL generator.
+    
+    Your task is to translate the user's natural language question into a valid Oracle SQL query.
+    
+    Use ONLY the table and columns listed in the schema.
+    
 
     Database Schema:
     Table name: amazon
@@ -63,35 +118,34 @@ def evaluate_ai_response():
     - review_content (VARCHAR2): Review content
     - img_link (VARCHAR2): Product image link
     - product_link (VARCHAR2): Product page link
-
-    HARD GRADUATION RULE:
-    Is force_generation equal to true? [Value: {force_generation}]
-    If force_generation is true, you MUST set "status": "success" and output your absolute best guess SELECT query using the columns available. Do not ask any more questions.
+        
+    Rules:
+    - Return ONLY the SQL query.
+    - Do not include explanations.
+    - Do not include markdown.
+    - Use Oracle SQL syntax.
+    - Use FETCH FIRST N ROWS ONLY instead of LIMIT.
+    - Generate SELECT queries only.
+    - IMPORTANT FOR NUMBERS: Columns like 'rating' and 'rating_count' may be stored as VARCHAR2. 
+      Always use TO_NUMBER(REGEXP_REPLACE(column_name, '[^0-9.]', '')) when filtering or sorting numeric calculations to safely handle formatting characters like commas or spaces.
     
-    Rules for Classification (If force_generation is false):
-    1. If context is missing clear metrics, set "status": "ambiguous" and provide a NEW, explicit follow-up question in "follow_up_message". Leave "sql" as null.
-    2. If specific enough, set "status": "success", "follow_up_message": null, and generate the valid Oracle SQL string in "sql".
+    Example:
+    User Query:
+    Retrieve product names where the evaluation count is over 1000.
     
-    SQL Generation Rules:
-    - Use Oracle SQL syntax. FETCH FIRST N ROWS ONLY instead of LIMIT.
-    - Generate SELECT queries only. No destructive commands.
-    - Always use TO_NUMBER(REGEXP_REPLACE(column_name, '[^0-9.]', '')) when filtering or sorting numeric columns like 'rating' and 'rating_count'.
+    SQL Output:
+    SELECT product_name 
+    FROM AMAZON 
+    WHERE TO_NUMBER(REGEXP_REPLACE(rating_count, '[^0-9.]', '')) > 1000
+    ORDER BY TO_NUMBER(REGEXP_REPLACE(rating, '[^0-9.]', '')) DESC
+    FETCH FIRST 5 ROWS ONLY
     
-    You MUST respond with a raw JSON object matching this structure exactly:
-    {{
-        "status": "success" or "ambiguous",
-        "follow_up_message": "Clarification question text here if ambiguous, otherwise null",
-        "sql": "The generated SQL query here if success, otherwise null"
-    }}
-
-    Note: Dont add ; at the end of the SQL Query.
+    Real Task:
+    User Query:
+    {user_question}
     
-    [CONVERSATION HISTORY TRACKER]
-    {conversation_history if "conversation_history" in locals() else ""}
-    
-    Output:
+    SQL Output:
     """
-
   
     
     try:
