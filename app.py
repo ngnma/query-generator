@@ -1,5 +1,6 @@
 import streamlit as st
 from ai_sql_generator import generate_sql
+from validator import validate_sql
 from db import run_sql
 
 SCHEMA_TEXT = """
@@ -32,6 +33,7 @@ if st.button("Run Query"):
                 sql = generate_sql(user_question, SCHEMA_TEXT)
                 
                 st.subheader("Generated SQL")
+                validate_sql(sql)
             with st.spinner("Running query on Oracle Database..."):
                 result_df = run_sql(sql)
             st.subheader("Query Result")
