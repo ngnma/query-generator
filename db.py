@@ -4,11 +4,11 @@ import pandas as pd
 
 connection = oracledb.connect(
     user="ADMIN",
-    password="YOUR_DATABASE_PASSWORD",
-    dsn="YOURDB_low",
+    password="Password1234",
+    dsn="amazonsales_low",
     config_dir="/home/datascience/wallet",
     wallet_location="/home/datascience/wallet",
-    wallet_password="YOUR_WALLET_PASSWORD"
+    wallet_password="Password1234"
 )
 
 def run_sql(query="SELECT * FROM AMAZON FETCH FIRST 10 ROWS ONLY"):
