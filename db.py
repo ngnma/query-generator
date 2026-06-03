@@ -1,17 +1,37 @@
-import requests
+import os
 import oracledb
 import pandas as pd
+import streamlit as st
 
-connection = oracledb.connect(
-    user="ADMIN",
-    password="Password1234",
-    dsn="amazonsales_low",
-    config_dir="/home/opc/nl-query-agent/wallet",
-    wallet_location="/home/opc/nl-query-agent/wallet",
-    wallet_password="Password1234"
-)
+# We use st.cache_resource to ensure the connection pool is created ONCE 
+# and shared across all user sessions and reruns.
+@st.cache_resource
+def get_connection_pool():
+    """
+    Initializes and caches a secure Oracle connection pool using the provided wallet.
+    """
+    return oracledb.create_pool(
+        user="ADMIN",
+        password="Password1234",
+        dsn="amazonsales_low",
+        config_dir="/home/opc/nl-query-agent/wallet",
+        wallet_location="/home/opc/nl-query-agent/wallet",
+        wallet_password="Password1234",
+        min=1,     # Minimum number of active connections to keep open
+        max=5,     # Maximum connections the pool can scale to
+        increment=1
+    )
 
 def run_sql(query="SELECT * FROM AMAZON FETCH FIRST 10 ROWS ONLY"):
-    df = pd.read_sql(query, connection)
-    print(df.head())
-    return df
+    """
+    Acquires a fresh connection from the pool, executes the query into a DataFrame,
+    and safely returns the connection back to the pool automatically.
+    """
+    # Get our cached connection pool
+    pool = get_connection_pool()
+    
+    # 'with pool.acquire()' guarantees the connection drops back to the pool 
+    # even if the query execution fails mid-way.
+    with pool.acquire() as conn:
+        df = pd.read_sql(query, conn)
+        return df
