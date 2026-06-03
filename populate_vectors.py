@@ -9,7 +9,7 @@ gen_ai_client = oci.generative_ai_inference.GenerativeAiInferenceClient(
 )
 
 # Connect to your Autonomous DB
-conn = oracledb.connect(user="ADMIN", password="YourDBPassword", dsn="your_db_dsn")
+conn = oracledb.connect(user="ADMIN", password="Password1234", dsn="your_db_dsn")
 cursor = conn.cursor()
 
 # Fetch your existing inventory rows
