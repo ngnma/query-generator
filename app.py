@@ -92,14 +92,16 @@ Respond ONLY with this raw JSON, no markdown, no extra text:
 
         if result_data.get("status") == "success" or force_generation == "true":
             st.session_state.is_ready = True
-            st.session_state.ai_message = result_data.get("sql")
+            sql = result_data.get("sql", "")
+            sql = sql.strip().rstrip(";").strip()  # ← add this line
+            st.session_state.ai_message = sql
         else:
             st.session_state.is_ready = False
             st.session_state.ai_message = result_data.get("follow_up_message")
 
     except Exception as e:
         st.session_state.is_ready = True
-        st.session_state.ai_message = "SELECT * FROM amazon FETCH FIRST 10 ROWS ONLY"
+        st.session_state.ai_message = "SELECT * FROM amazon FETCH FIRST 20 ROWS ONLY"
 
 
 # ==========================================
