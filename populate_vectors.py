@@ -9,7 +9,7 @@ gen_ai_client = oci.generative_ai_inference.GenerativeAiInferenceClient(
 )
 
 # Connect to your Autonomous DB
-conn = oracledb.connect(user="ADMIN", password="Password1234", dsn="your_db_dsn")
+conn = oracledb.connect(user="ADMIN", password="Password1234", dsn="(description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.uk-london-1.oraclecloud.com))(connect_data=(service_name=g3611c40115fb3c_amazonsales_high.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))")
 cursor = conn.cursor()
 
 # Fetch your existing inventory rows
