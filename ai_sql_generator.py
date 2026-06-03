@@ -277,7 +277,7 @@ def run_conversational_loop():
         Your task is to analyze the user's inquiry stream. You must determine if the total context accumulated across the conversation history is specific enough to build a definitive Oracle SQL query.
         
         CRITICAL RULE: Look at the conversation history carefully. Do not repeat questions that the user has already answered! Read their previous responses to build your context.
-
+        CRITICAL RULE: Do not add ; at the end of the generated SQL code
         Database Schema:
         Table name: amazon
         Columns:
