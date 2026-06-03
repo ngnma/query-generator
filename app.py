@@ -6,20 +6,24 @@ from validator import validate_sql
 from db import run_sql
 
 SCHEMA_TEXT = """
-Table: AMAZON_SALES
+Table: amazon
 Columns:
-- ORDER_ID
-- ORDER_DATE
-- SHIP_DATE
-- REGION
-- COUNTRY
-- CITY
-- CATEGORY
-- PRODUCT_NAME
-- SALES
-- QUANTITY
-- PROFIT
-- DISCOUNT
+- product_id
+- product_name
+- category
+- discounted_price
+- actual_price
+- discount_percentage
+- rating
+- rating_count
+- about_product
+- user_id
+- user_name
+- review_id
+- review_title
+- review_content
+- img_link
+- product_link
 """
 
 # ==========================================
@@ -41,7 +45,24 @@ def evaluate_ai_response():
     CRITICAL RULE: Look at the conversation history carefully. Do not repeat questions that the user has already answered! Read their previous responses to build your context.
 
     Database Schema:
-    {SCHEMA_TEXT}
+    Table name: amazon
+    Columns:
+    - product_id (VARCHAR2): Product ID
+    - product_name (VARCHAR2): Product name
+    - category (VARCHAR2): Product category
+    - discounted_price (VARCHAR2): Discounted price
+    - actual_price (VARCHAR2): Original price
+    - discount_percentage (VARCHAR2): Discount percentage
+    - rating (VARCHAR2): Product rating
+    - rating_count (VARCHAR2): Number of ratings/reviews
+    - about_product (VARCHAR2): Product description
+    - user_id (VARCHAR2): User ID
+    - user_name (VARCHAR2): User name
+    - review_id (VARCHAR2): Review ID
+    - review_title (VARCHAR2): Review title
+    - review_content (VARCHAR2): Review content
+    - img_link (VARCHAR2): Product image link
+    - product_link (VARCHAR2): Product page link
 
     HARD GRADUATION RULE:
     Is force_generation equal to true? [Value: {force_generation}]
@@ -64,7 +85,7 @@ def evaluate_ai_response():
     }}
     
     [CONVERSATION HISTORY TRACKER]
-    {st.session_state.conversation_history}
+    {conversation_history if "conversation_history" in locals() else ""}
     
     Output:
     """
@@ -84,7 +105,7 @@ def evaluate_ai_response():
     except Exception as e:
         # Crash fallback
         st.session_state.is_ready = True
-        st.session_state.ai_message = f"SELECT * FROM AMAZON_SALES FETCH FIRST 10 ROWS ONLY; -- Fallback Error: {e}"
+        st.session_state.ai_message = f"SELECT * FROM amazon FETCH FIRST 10 ROWS ONLY; -- Fallback Error: {e}"
 
 # ==========================================
 # HELPER FUNCTION 2: Managing the Chat Memory
