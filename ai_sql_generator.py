@@ -29,7 +29,12 @@ def generate_sql(user_question, schema_text):
     Use ONLY the table and columns listed in the schema.
     
     Database Schema:
-    {schema_text}
+    Table name: amazon
+    Columns:
+    - product_id (VARCHAR2)
+    - product_name (VARCHAR2)
+    - rating (NUMBER)
+    - rating_count (NUMBER)
     
     Rules:
     - Return ONLY the SQL query.
@@ -42,13 +47,13 @@ def generate_sql(user_question, schema_text):
     
     Example:
     User Query:
-    Retrieve the IDs and names of the top 3 products with the highest discount percentages.
+    Retrieve the IDs and names of the top 3 products with the highest rating.
     
     SQL Output:
     SELECT product_id, product_name
-    FROM AMAZON
-    ORDER BY discount_percentage DESC
-    FETCH FIRST 3 ROWS ONLY;
+    FROM amazon
+    ORDER BY rating DESC
+    FETCH FIRST 3 ROWS ONLY
     
     Real Task:
     User Query:
