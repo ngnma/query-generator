@@ -14,3 +14,4 @@ connection = oracledb.connect(
 def run_sql(query="SELECT * FROM AMAZON FETCH FIRST 10 ROWS ONLY"):
     df = pd.read_sql(query, connection)
     print(df.head())
+    return df
