@@ -246,7 +246,14 @@ def call_ai_inference_endpoint(prompt_payload):
 
     response = gen_ai_client.chat(chat_detail)
     raw_text = response.data.chat_response.text.strip()
-    return raw_text.replace("```json", "").replace("```", "").strip()
+    
+    # --- TARGETED FIX APPLIED HERE ---
+    # Strip markdown headers and flatten illegal text control carriage returns
+    raw_text = raw_text.replace("```json", "").replace("```", "").strip()
+    raw_text = raw_text.replace("\n", " ").replace("\r", " ")
+    
+    # Return the clean raw string text so json.loads works in the main loop
+    return raw_text
 
 
 def run_conversational_loop():
@@ -351,4 +358,5 @@ def run_conversational_loop():
                 
         except Exception as e:
             print(f"\n⚠️ Structural Parsing Exception hit: {e}. Defaulting emergency crash exit.")
+            return True, conversation_history
             return True, conversation_history
