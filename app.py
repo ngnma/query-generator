@@ -242,7 +242,10 @@ if user_question and (run_button or st.session_state.get("original_q") == user_q
                 })
 
             # Tab Layout Rendering
-            tab_results, tab_insights, tab_sql = st.tabs(["📋 Results", "💡 Insights", "⌨️ SQL"])
+            # Include an additional tab for dynamic charts alongside Results, Insights, and SQL
+            tab_results, tab_insights, tab_sql, tab_dyn_charts = st.tabs([
+                "📋 Results", "💡 Insights", "⌨️ SQL", "📊 Charts"
+            ])
 
             with tab_results:
                 st.dataframe(result_df, use_container_width=True)
@@ -296,6 +299,11 @@ if user_question and (run_button or st.session_state.get("original_q") == user_q
             with tab_sql:
                 st.subheader("Generated Oracle SQL")
                 st.code(final_sql, language="sql")
+
+            # New dynamic charts tab for result visualisation
+            with tab_dyn_charts:
+                from charts_in_results_tab import render_charts_in_results
+                render_charts_in_results(result_df)
 
 # ── Sidebar Control Panel History ────────────────────────────────
 with st.sidebar:
@@ -354,11 +362,3 @@ with tab_followups:
     from followup_suggestions_tab import render_followup_suggestions_tab
     render_followup_suggestions_tab()
 
-# ── Dynamic Charts Tab ──────────────────────────────────────────
-# This tab lets users create interactive charts from the results of previous
-# queries. It does not alter the main flow and uses a separate module
-# `charts_tab.py` to render various chart types depending on the data.
-tab_charts, = st.tabs(["📊 Dynamic Charts"])
-with tab_charts:
-    from charts_tab import render_charts_tab
-    render_charts_tab()
