@@ -5,19 +5,13 @@ from ai_sql_generator import call_ai_inference_endpoint
 
 
 def format_sql_explanation(text: str) -> str:
-    """
-    Clean and format the AI explanation so Streamlit displays it nicely.
-    """
-
     if not text:
         return "SQL explanation was not available."
 
     text = text.strip()
 
-    # Remove unwanted leading label if model returns it
     text = re.sub(r"^Explanation:\s*", "", text, flags=re.IGNORECASE)
 
-    # Force section headers onto new lines
     section_headers = [
         "Query Summary:",
         "Step-by-Step Breakdown:",
@@ -26,12 +20,13 @@ def format_sql_explanation(text: str) -> str:
     ]
 
     for header in section_headers:
-        text = text.replace(header, f"\n\n### {header}")
+        text = text.replace(header, f"\n\n**{header}**")
 
-    # Force numbered steps onto separate lines
     text = re.sub(r"\s+(\d+\.)\s+", r"\n\n\1 ", text)
 
-    # Clean excessive blank lines
+    # Put bullet-style Potential Notes on separate lines
+    text = re.sub(r"\s+-\s+", r"\n\n- ", text)
+
     text = re.sub(r"\n{3,}", "\n\n", text)
 
     return text.strip()
