@@ -362,14 +362,4 @@ with tab_followups:
     from followup_suggestions_tab import render_followup_suggestions_tab
     render_followup_suggestions_tab()
 
-# ── Additional Insightful Charts Tab ───────────────────────────
-# This tab generates high‑level aggregated charts derived from the
-# full Amazon dataset, independent of the current query result. These
-# charts help users explore sales distributions across categories,
-# ratings, and price ranges. The charts live in a separate module to
-# avoid interfering with existing functionality.
-tab_related_charts, = st.tabs(["📈 Related Charts"])
-with tab_related_charts:
-    from insightful_charts_tab import render_insightful_charts_tab
-    render_insightful_charts_tab()
 
