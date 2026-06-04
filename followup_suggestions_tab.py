@@ -191,12 +191,7 @@ def render_followup_suggestions_tab() -> None:
                 return
 
             st.subheader("Suggested Follow‑Up Questions")
+            # Display the suggestions as a simple numbered list. The
+            # 'Use this' buttons have been removed per the user's request.
             for idx, suggestion in enumerate(suggestions):
-                col = st.columns([8, 2])  # 80/20 split for text and button
-                with col[0]:
-                    st.markdown(f"{idx + 1}. {suggestion}")
-                with col[1]:
-                    if st.button("Use this", key=f"use_suggestion_{idx}"):
-                        # Insert the suggestion back into the query input area
-                        st.session_state.prefill = suggestion
-                        st.success("Suggestion added to query input! Scroll back to the query box.")
+                st.markdown(f"{idx + 1}. {suggestion}")
