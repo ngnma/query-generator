@@ -5,7 +5,7 @@ from oci.generative_ai_inference.models import OnDemandServingMode, ChatDetails,
 
 def sql_explanation(sql_query):
     # ads.set_auth('resource_principal')
-    signer = oci.auth.signers.get_resource_principals_signer()
+    # signer = oci.auth.signers.get_resource_principals_signer()
     
     gen_ai_client = GenerativeAiInferenceClient(
         config={}, 
