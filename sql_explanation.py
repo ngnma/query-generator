@@ -4,7 +4,7 @@ from ai_sql_generator import call_ai_inference_endpoint
 def sql_explanation(sql_query):
 
     
-    few_shot_context = f"""
+    prompt_payload = f"""
     You are an expert SQL explanation assistant.
     
     Your task is to explain a generated SQL query to a non-technical or semi-technical user. Whenever I give you a SQL query, explain what it does clearly and accurately.
