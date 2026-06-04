@@ -255,19 +255,22 @@ if user_question and (run_button or st.session_state.get("original_q") == user_q
                 )
 
             with tab_insights:
-                st.subheader("Explanation:")
+                # st.subheader("Explanation:")
                 
-                try:
-                    explanation_text = sql_explanation(final_sql)
-                except Exception as e:
-                    explanation_text = None
-                    st.warning(f"Could not generate SQL explanation: {e}")
+                # try:
+                #     explanation_text = sql_explanation(final_sql)
+                # except Exception as e:
+                #     explanation_text = None
+                #     st.warning(f"Could not generate SQL explanation: {e}")
                 
-                if explanation_text:
-                    st.markdown(explanation_text)
-                else:
-                    st.info("SQL explanation was not available for this query.")
+                # if explanation_text:
+                #     st.markdown(explanation_text)
+                # else:
+                #     st.info("SQL explanation was not available for this query.")
                 
+                # st.divider()
+                st.subheader("Summary")
+                st.markdown(sql_explanation(final_sql))
                 st.divider()
 
                 num_cols = result_df.select_dtypes(include="number").columns.tolist()
