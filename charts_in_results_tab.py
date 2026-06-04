@@ -15,7 +15,10 @@ a message is displayed instead of charts.
 from typing import List, Optional
 
 import pandas as pd
-import matplotlib.pyplot as plt
+# Note: matplotlib is unavailable in this environment.  We rely on
+# Streamlit's built‑in chart functions (bar_chart and line_chart) instead
+# of importing and using matplotlib.  If additional plotting capabilities
+# become available in the future, they can be integrated here.
 import streamlit as st
 
 
@@ -76,53 +79,48 @@ def render_charts_in_results(df: pd.DataFrame) -> None:
     categorical_cols = [col for col in data.columns if col not in numeric_cols]
     # Flag to track if any chart was rendered
     rendered_any = False
-    # Bar and pie charts if at least one numeric and one categorical column
+    # Bar chart (and pseudo‑pie chart) if at least one numeric and one categorical column
     if numeric_cols and categorical_cols:
         x_col = categorical_cols[0]
         y_col = numeric_cols[0]
-        # Aggregate by category (sum of numeric)
+        # Aggregate by category (sum of numeric). If grouping fails, fall back to raw data.
         try:
             bar_data = data[[x_col, y_col]].dropna()
             grouped = bar_data.groupby(x_col)[y_col].sum().reset_index()
         except Exception:
             grouped = data[[x_col, y_col]].dropna()
-        # Bar chart
-        fig_bar, ax_bar = plt.subplots()
-        ax_bar.bar(grouped[x_col], grouped[y_col])
-        ax_bar.set_xlabel(x_col)
-        ax_bar.set_ylabel(y_col)
-        ax_bar.set_title(f"Sum of {y_col} by {x_col}")
-        plt.xticks(rotation=45, ha="right")
-        st.pyplot(fig_bar)
-        rendered_any = True
-        # Pie chart
-        fig_pie, ax_pie = plt.subplots()
-        ax_pie.pie(grouped[y_col], labels=grouped[x_col], autopct="%1.1f%%")
-        ax_pie.set_title(f"Distribution of {y_col} by {x_col}")
-        st.pyplot(fig_pie)
-    # Scatter chart if at least two numeric columns exist
+        if not grouped.empty:
+            st.subheader(f"Sum of {y_col} by {x_col}")
+            # Convert to pivot form for bar_chart (index as category)
+            bar_df = grouped.set_index(x_col)[y_col]
+            st.bar_chart(bar_df)
+            rendered_any = True
+            # Represent the distribution using another bar chart rather than a pie chart
+            # to avoid unsupported pie chart rendering. Compute percentages.
+            percent_series = grouped[y_col] / grouped[y_col].sum() * 100
+            percent_df = pd.DataFrame({"Percentage": percent_series}).set_index(grouped[x_col])
+            st.subheader(f"Percentage distribution of {y_col} by {x_col}")
+            st.bar_chart(percent_df)
+    # If there are at least two numeric columns, present them as a simple multi‑line chart.
     if len(numeric_cols) >= 2:
         x_num = numeric_cols[0]
         y_num = numeric_cols[1]
-        fig_scatter, ax_scatter = plt.subplots()
-        ax_scatter.scatter(data[x_num], data[y_num])
-        ax_scatter.set_xlabel(x_num)
-        ax_scatter.set_ylabel(y_num)
-        ax_scatter.set_title(f"Scatter Plot: {y_num} vs {x_num}")
-        st.pyplot(fig_scatter)
-        rendered_any = True
-    # Line chart if a date/time column exists
+        # Prepare a DataFrame for multi‑line chart: using the row index as x axis
+        multi_df = data[[x_num, y_num]].dropna()
+        if not multi_df.empty:
+            st.subheader(f"Line chart comparing {x_num} and {y_num}")
+            st.line_chart(multi_df[[x_num, y_num]])
+            rendered_any = True
+    # If there is a date/time column and a numeric column, display a time series trend
     date_col = _detect_date_column(data)
     if date_col and numeric_cols:
         y_dt = numeric_cols[0]
         dt_data = data[[date_col, y_dt]].dropna().sort_values(date_col)
-        fig_line, ax_line = plt.subplots()
-        ax_line.plot(dt_data[date_col], dt_data[y_dt])
-        ax_line.set_xlabel(date_col)
-        ax_line.set_ylabel(y_dt)
-        ax_line.set_title(f"Trend of {y_dt} over {date_col}")
-        plt.xticks(rotation=45, ha="right")
-        st.pyplot(fig_line)
-        rendered_any = True
+        if not dt_data.empty:
+            # Create a line chart with date/time as index and numeric as value
+            trend_df = dt_data.set_index(date_col)[y_dt]
+            st.subheader(f"Trend of {y_dt} over {date_col}")
+            st.line_chart(trend_df)
+            rendered_any = True
     if not rendered_any:
         st.warning("No suitable numeric or categorical columns found to generate charts.")
