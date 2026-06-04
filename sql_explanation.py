@@ -1,21 +1,8 @@
-import oci
-# import ads
-from oci.generative_ai_inference import GenerativeAiInferenceClient
-from oci.generative_ai_inference.models import OnDemandServingMode, ChatDetails, CohereChatRequest
+from ai_sql_generator import call_ai_inference_endpoint
+
 
 def sql_explanation(sql_query):
-    # ads.set_auth('resource_principal')
-    # signer = oci.auth.signers.get_resource_principals_signer()
-    
-    gen_ai_client = GenerativeAiInferenceClient(
-        config={}, 
-        signer=signer, 
-        service_endpoint="https://inference.generativeai.uk-london-1.oci.oraclecloud.com"
-    )
-    
-    compartment_id = "ocid1.tenancy.oc1..aaaaaaaapigjcw7dwdp6onerp5wqcu3z5pzsckmokdiqjezvoodfi2corv6q"
-    
-    model_id = "cohere.command-r-plus-08-2024"
+
     
     few_shot_context = f"""
     You are an expert SQL explanation assistant.
@@ -175,20 +162,8 @@ def sql_explanation(sql_query):
     
     """
     
-    chat_request = CohereChatRequest()
-    chat_request.message = few_shot_context
-    chat_request.max_tokens = 300       
-    chat_request.temperature = 0.0  
-    
-    chat_detail = ChatDetails()
-    chat_detail.compartment_id = compartment_id
-    chat_detail.serving_mode = OnDemandServingMode(model_id=model_id)
-    chat_detail.chat_request = chat_request
-    
     try:
-        response = gen_ai_client.chat(chat_detail)
-        print("\n=== 🎯 Generated based on the Amazon dataset SQL ===")
-        print(response.data.chat_response.text)
-        return response.data.chat_response.text
+        explanation = call_ai_inference_endpoint(prompt_payload)
+        return explanation.strip() if explanation else "SQL explanation was not available."
     except Exception as e:
-        print(f"wrong: {e}")
+        return f"SQL explanation could not be generated: {e}"
