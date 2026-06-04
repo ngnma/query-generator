@@ -157,8 +157,12 @@ def render_followup_suggestions_tab() -> None:
         options.append(item)
         labels.append(f"{item['question']} (ran at {item['time']})")
 
+    # Provide a unique key for this selectbox to avoid duplicate element IDs
     selected_idx = st.selectbox(
-        "Choose a query to analyze", options=list(range(len(options))), format_func=lambda i: labels[i]
+        "Choose a query to analyze",
+        options=list(range(len(options))),
+        format_func=lambda i: labels[i],
+        key="followups_query_selectbox",
     )
     selected_item = options[selected_idx]
     question = selected_item.get("question", "")
