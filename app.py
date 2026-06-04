@@ -353,3 +353,12 @@ tab_followups, = st.tabs(["✨ Follow‑Up Suggestions"])
 with tab_followups:
     from followup_suggestions_tab import render_followup_suggestions_tab
     render_followup_suggestions_tab()
+
+# ── Dynamic Charts Tab ──────────────────────────────────────────
+# This tab lets users create interactive charts from the results of previous
+# queries. It does not alter the main flow and uses a separate module
+# `charts_tab.py` to render various chart types depending on the data.
+tab_charts, = st.tabs(["📊 Dynamic Charts"])
+with tab_charts:
+    from charts_tab import render_charts_tab
+    render_charts_tab()
