@@ -332,3 +332,13 @@ with tab_chat:
     # Import lazily within the tab context to avoid circular imports at startup
     from chat_tab import render_chat_tab
     render_chat_tab()
+
+# ── AI Insights Tab ────────────────────────────────────────────────
+# The AI Insights tab allows users to generate analytical observations
+# from previous query results. It does not interfere with the
+# existing execution flow. Users can pick a past query and produce
+# insights summarising patterns, trends, or anomalies within the result.
+tab_ai_insights, = st.tabs(["🧠 AI Insights"])
+with tab_ai_insights:
+    from insight_tab import render_insight_tab
+    render_insight_tab()
