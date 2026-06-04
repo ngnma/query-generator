@@ -307,7 +307,7 @@ with st.sidebar:
                 st.caption(item["time"])
                 st.caption("Generated SQL:")
                 st.code(item["sql"], language="sql")
-                st.caption("Summary:")
+                st.caption("Explanation:")
                 st.write(item["summary"])
                 if st.button("Run Again", key=f"rerun_{i}"):
                     st.session_state.prefill = item["question"]
