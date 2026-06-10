@@ -2,6 +2,7 @@ import os
 import oracledb
 import pandas as pd
 import streamlit as st
+from configs import conf
 
 # We use st.cache_resource to ensure the connection pool is created ONCE 
 # and shared across all user sessions and reruns.
@@ -10,17 +11,7 @@ def get_connection_pool():
     """
     Initializes and caches a secure Oracle connection pool using the provided wallet.
     """
-    return oracledb.create_pool(
-        user="ADMIN",
-        password="Password1234",
-        dsn="amazonsales_low",
-        config_dir="/home/opc/nl-query-agent/wallet",
-        wallet_location="/home/opc/nl-query-agent/wallet",
-        wallet_password="Password1234",
-        min=1,     # Minimum number of active connections to keep open
-        max=5,     # Maximum connections the pool can scale to
-        increment=1
-    )
+    return oracledb.create_pool(conf)
 
 def run_sql(query="SELECT * FROM AMAZON FETCH FIRST 10 ROWS ONLY"):
     """
